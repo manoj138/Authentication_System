@@ -37,47 +37,18 @@ const Dashboard = () => {
     }, []);
 
     const fetchDashboardData = async () => {
-        setLoading(true);
-        try {
-            const res = await Api.get('/products/stats');
-            const data = res?.data?.data;
-            setStatsData(prev => ({ 
-                ...prev, 
-                products: data?.totalProducts || 0,
-                myProducts: data?.userProducts || 0,
-                isAdmin: data?.isAdmin
-            }));
-        } catch (err) {
-            console.error("Dashboard data fetch failed:", err);
-            if (err.response?.status !== 401) {
-                handleApiError(err, null, addToast);
-            }
-        } finally {
-            setLoading(false);
-        }
+        // Core system metrics could be fetched here
+        setLoading(false);
     };
 
     const stats = [
-        { 
-            label: 'Universal Assets', 
-            value: statsData?.products || 0, 
-            change: '+14%', 
-            icon: Package, 
-            color: 'from-indigo-600 to-indigo-800', 
-            isHero: true,
-            action: {
-                icon: Plus,
-                path: '/admin/products/create',
-                tooltip: 'Add New'
-            }
-        },
-        { label: 'My Personal Assets', value: statsData?.myProducts || 0, change: '+5%', icon: Shield, color: 'from-slate-800 to-slate-900', isHero: false, show: user?.role === 'admin' },
-        { label: 'Revenue Est.', value: `₹${statsData?.revenue || '0'}`, change: '+18%', icon: ShoppingCart, color: 'from-slate-800 to-slate-900', isHero: false },
-    ].filter(s => s.show !== false);
+        { label: 'Active Sessions', value: '12', change: '+2', icon: Activity, color: 'from-indigo-600 to-indigo-800', isHero: true },
+        { label: 'System Health', value: '99.9%', change: 'Stable', icon: Zap, color: 'from-slate-800 to-slate-900', isHero: false },
+        { label: 'Security Alerts', value: '0', change: 'Clean', icon: Shield, color: 'from-slate-800 to-slate-900', isHero: false },
+    ];
 
     const quickActions = [
-        { name: 'Register Asset', icon: Package, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10', path: '/admin/products/create' },
-        { name: 'Inventory View', icon: Database, color: 'text-blue-500 bg-blue-50 dark:bg-blue-500/10', path: '/admin/products' },
+        { name: 'User Directory', icon: Users, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10', path: '/admin/users', roles: ['admin'] },
         { name: 'Settings Hub', icon: Settings, color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10', path: '/admin/settings' },
     ];
 
@@ -95,32 +66,25 @@ const Dashboard = () => {
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                            <Zap size={18} />
+                            <Shield size={18} />
                         </div>
-                        <span className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.3em]">Operational Core</span>
+                        <span className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.3em]">Security Core</span>
                     </div>
                     <h1 className="text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                        System <span className="text-indigo-600 dark:text-indigo-400">Hub</span>
+                        Access <span className="text-indigo-600 dark:text-indigo-400">Hub</span>
                     </h1>
                 </div>
                 
                 <div className="flex gap-4 relative z-10">
                     {user?.role === 'admin' ? (
-                        <>
-                            <Link to="/admin/products">
-                                <Button variant="secondary" size="lg" className="px-8 rounded-2xl border-slate-200 dark:border-white/10 font-bold">
-                                    Browse Inventory
-                                </Button>
-                            </Link>
-                            <Link to="/admin/products/create">
-                                <Button variant="primary" size="lg" icon={Package} className="px-8 rounded-2xl shadow-xl shadow-indigo-500/20 font-bold">
-                                    Add New Asset
-                                </Button>
-                            </Link>
-                        </>
+                        <Link to="/admin/users">
+                            <Button variant="primary" size="lg" icon={Users} className="px-8 rounded-2xl shadow-xl shadow-indigo-500/20 font-bold">
+                                Manage Directory
+                            </Button>
+                        </Link>
                     ) : (
                         <Button variant="outline" size="lg" className="px-8 rounded-2xl font-bold">
-                            Request Access
+                            View Profile
                         </Button>
                     )}
                 </div>
@@ -148,7 +112,6 @@ const Dashboard = () => {
                                 <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[10px] font-black tracking-widest ${
                                     item.isHero ? 'bg-white/10 text-white' : 'bg-emerald-500/10 text-emerald-500'
                                 }`}>
-                                    <TrendingUp size={14} />
                                     {item.change}
                                 </div>
                             </div>
@@ -159,23 +122,6 @@ const Dashboard = () => {
                                 }`}>
                                     {item.label}
                                 </h3>
-                                
-                                {item.action && user?.role === 'admin' && (
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(item.action.path);
-                                        }}
-                                        className={`p-1.5 rounded-lg transition-all duration-300 ${
-                                            item.isHero 
-                                                ? 'bg-white/10 hover:bg-white/20 text-white' 
-                                                : 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white shadow-lg shadow-indigo-500/10'
-                                        }`}
-                                        title={item.action.tooltip}
-                                    >
-                                        <item.action.icon size={16} />
-                                    </button>
-                                )}
                             </div>
                             
                             <div className="flex items-center justify-between">
@@ -193,29 +139,6 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            {/* Main Action Banner */}
-            {user?.role === 'admin' && (
-                <div className="relative rounded-[3.5rem] bg-indigo-600 p-12 overflow-hidden shadow-2xl shadow-indigo-500/30 group">
-                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-                    <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-indigo-500/50 to-transparent" />
-                    
-                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="text-center md:text-left">
-                            <h2 className="text-3xl font-black text-white mb-3">Scale Your Inventory</h2>
-                            <p className="text-indigo-100 max-w-xl text-lg font-medium opacity-80">
-                                Our Inventory module is optimized for rapid asset entry. 
-                                Execute a new product registration in less than 30 seconds.
-                            </p>
-                        </div>
-                        <Link to="/admin/products/create">
-                            <button className="px-10 py-5 bg-white text-indigo-600 rounded-3xl font-black text-lg hover:bg-slate-50 hover:scale-105 transition-all shadow-xl flex items-center gap-3">
-                                <Package size={24} />
-                                Start Inventory Entry
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            )}
 
             {/* Info Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -231,7 +154,7 @@ const Dashboard = () => {
                     
                     <div className="space-y-6">
                         {[
-                            { title: 'NexusCore Sync', desc: 'Product inventory refreshed', time: 'Just now', icon: Activity },
+                            { title: 'NexusCore Sync', desc: 'Secure database refreshed', time: 'Just now', icon: Activity },
                             { title: 'Security Protocol', desc: 'Auth credentials verified', time: '14m ago', icon: Shield },
                             { title: 'Data Backup', desc: 'Auto-snapshot completed', time: '2h ago', icon: Database },
                         ].map((log, i) => (

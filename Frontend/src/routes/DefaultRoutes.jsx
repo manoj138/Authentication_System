@@ -2,10 +2,6 @@ import React from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import Dashboard from '../pages/backend/Dashboard'
 import DefaultLayout from '../layout/DefaultLayout'
-import ProductIndex from '../pages/backend/Product/ProductIndex'
-import ProductCreate from '../pages/backend/Product/ProductCreate'
-import ProductEdit from '../pages/backend/Product/ProductEdit'
-import ProductShow from '../pages/backend/Product/ProductShow'
 import UserIndex from '../pages/backend/user/UserIndex'
 
 // Auth Pages
@@ -30,12 +26,6 @@ const DefaultRoutes = () => {
         <Route path="/admin" element={<DefaultLayout />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          
-          {/* Admin and User Routes */}
-          <Route path="products" element={<ProductIndex />} />
-          <Route path="products/create" element={<ProductCreate />} />
-          <Route path="products/edit/:id" element={<ProductEdit />} />
-          <Route path="products/show/:id" element={<ProductShow />} />
           
           {/* Admin-only Routes */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

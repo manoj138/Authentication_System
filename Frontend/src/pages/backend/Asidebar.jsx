@@ -26,7 +26,6 @@ const Asidebar = () => {
 
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Manage Inventory", path: "/admin/products", icon: Package },
     { name: "User Directory", path: "/admin/users", icon: Users, roles: ['admin'] },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ];
